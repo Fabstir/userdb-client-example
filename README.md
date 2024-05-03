@@ -39,7 +39,7 @@ await dbClient
   .user(userPub2)
   .get("test")
   .get("1")
-  .put({name: "hello world"});
+  .put({message: "hello world"});
 user.logout();
 
 user.auth("username2", "mypassword2")
@@ -50,8 +50,8 @@ user.logout();
 user.auth("username1", "mypassword1")
 const dataAgain = await dbClient.user(userPub2).get('test').get('1').once();
 
-console.log(data.name); // "hello world"
-console.log(dataAgain.name); // "hello world"
+console.log(data.message); // "hello world"
+console.log(dataAgain.message); // "hello world"
 ```
 
 # API Documentation
