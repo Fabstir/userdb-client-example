@@ -39,10 +39,7 @@ await dbClient
   .user(userPub2)
   .get("test")
   .get("1")
-  .put(
-	{
-	  name: "hello world",
-	},
+  .put({name: "hello world"});
 user.logout();
 
 user.auth("username2", "mypassword2")
