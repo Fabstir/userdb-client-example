@@ -1,7 +1,7 @@
 // hooks/useCreateNFT.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getNFTAddressId } from "../utils/nftUtils"; // Ensure the correct path
-import { user } from "../user";
+import { getUser } from "../GlobalOrbit";
 
 interface NFT {
   address: string;
@@ -12,10 +12,12 @@ interface NFT {
 
 export const useCreateNFT = () => {
   const queryClient = useQueryClient();
+  const user = getUser();
 
   const mutation = useMutation<any, Error, NFT>({
     mutationFn: async (nft: NFT) => {
       const addressId = getNFTAddressId(nft);
+
       // Await the asynchronous put operation and handle callbacks within the put function
       return user.get("nfts").get(addressId).put(nft);
     },

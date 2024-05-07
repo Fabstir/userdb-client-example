@@ -1,27 +1,21 @@
-import createDBClient from "./utils/createtDBClient";
-
+import { createDBClient } from "fabstirdb-lib";
 /**
  * Instance of the OrbitDB client, created using the backend URL.
  */
-let dbClient = createDBClient(process.env.NEXT_PUBLIC_BACKEND_URL || "");
+const dbClient = createDBClient(process.env.NEXT_PUBLIC_BACKEND_URL || "");
 
-/**
- * Updates the OrbitDB client with a new instance created using the provided user public key.
- *
- * @param {string} userPubKey - The user's public key.
- */
-export const updateDbClient = (userPubKey: string) => {
-  dbClient = createDBClient(
-    process.env.NEXT_PUBLIC_BACKEND_URL || "",
-    userPubKey
-  );
+const getUser = () => {
+  if (!dbClient.user) return null;
+
+  const user = dbClient.user();
+  console.log("GlobalOrbit.ts: user: ", user);
+  return user;
 };
 
-/**
- * Resets the OrbitDB client with a new instance created using the backend URL.
- */
-export const resetDbClient = () => {
-  dbClient = createDBClient(process.env.NEXT_PUBLIC_BACKEND_URL || "");
-};
+console.log(
+  "GlobalOrbit.ts: process.env.NEXT_PUBLIC_BACKEND_URL: ",
+  process.env.NEXT_PUBLIC_BACKEND_URL
+);
+console.log("GlobalOrbit.ts: dbClient: ", dbClient);
 
-export { dbClient };
+export { dbClient, getUser };

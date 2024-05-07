@@ -4,12 +4,12 @@ import { dbClient } from "../GlobalOrbit"; // Assuming this is the correct impor
 import { queryClient } from "../queryClient";
 import { getNFTAddressId } from "../utils/nftUtils";
 
-interface NFT {
+type NFT = {
   address: string;
   id: string;
   name: string;
   description: string;
-}
+};
 
 const fetchNFT = async (
   userPub: string,

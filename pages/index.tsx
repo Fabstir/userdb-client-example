@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useCreateNFT } from "../src/hooks/useCreateNFT";
 import { useNFTs } from "../src/hooks/useNFTs";
 import { useRecoilState } from "recoil";
-import { user } from "../src/user"; // Ensure this path is correct
+
+// Ensure this path is correct
 import { libsodium } from "../src/utils/libsodium";
 import { useQueryClient } from "@tanstack/react-query";
 import UserNFTs from "../src/components/userNFTs";
 import { userpubstate1 } from "../src/atoms/userAtom1";
 import { userpubstate2 } from "../src/atoms/userAtom2";
-import { dbClient } from "../src/GlobalOrbit";
+import { dbClient, getUser } from "../src/GlobalOrbit";
 
 export default function Home() {
   const [userSession, setUserSession] = useState(null);
@@ -17,11 +18,17 @@ export default function Home() {
   const [userPub1, setUserPub1] = useRecoilState(userpubstate1);
   const [userPub2, setUserPub2] = useRecoilState(userpubstate2);
 
+  const user = getUser();
+  console.log("index.tsx: user: ", user);
+
   useEffect(() => {
     // Check if user session exists
-    const session = user.recall();
-    if (session) {
-      setUserSession(session);
+    console.log("index.tsx: useEffect: user: ", user);
+    if (user?.recall) {
+      const session = user.recall();
+      if (session) {
+        setUserSession(session);
+      }
     }
   }, []);
 
@@ -30,7 +37,7 @@ export default function Home() {
     // const password = "mypassword";
     // The ready check is no longer necessary here since libsodium is initialized at the app level
 
-    if (!(await user.exists(alias))) {
+    if (!(await user?.exists(alias))) {
       user.create(alias, password, (error, keys) => {
         if (error) {
           console.error("User creation failed:", error);
