@@ -9,6 +9,13 @@ import UserNFTs from "../src/components/userNFTs";
 import { userpubstate1 } from "../src/atoms/userAtom1";
 import { userpubstate2 } from "../src/atoms/userAtom2";
 import { dbClient, getUser } from "../src/GlobalOrbit";
+let Gun, SEA;
+
+// Check if the code is running on the client-side
+if (typeof window !== "undefined") {
+  Gun = require("gun/gun");
+  SEA = require("gun/sea");
+}
 
 type UserKeys = {
   priv: string;
@@ -28,6 +35,7 @@ export default function Home() {
   const queryClient = useQueryClient();
   const [userPub1, setUserPub1] = useRecoilState(userpubstate1);
   const [userPub2, setUserPub2] = useRecoilState(userpubstate2);
+  const [message, setMessage] = useState<string>("");
 
   const user = getUser();
   console.log("index.tsx: user: ", user);
@@ -112,6 +120,38 @@ export default function Home() {
     console.log("handleAddWriteAccess: User2 gave write permission to user1");
   };
 
+  const handleLoadContentAddressed = async () => {
+    const data = { message: "hello world" };
+
+    const hash = await SEA.work(data, null, null, { name: "SHA-256" });
+
+    const user = dbClient.user();
+
+    try {
+      await user
+        .get("#")
+        .get(hash)
+        .put(data, undefined, (ackError: any) => {
+          console.error(ackError);
+        });
+
+      const message = await new Promise((res) =>
+        user
+          .get("#")
+          .get(hash)
+          .once((final_value: any) => res(final_value))
+      );
+
+      console.log("handleLoadContentAddressed: message:", message);
+      setMessage(message.message);
+    } catch (error) {
+      console.error(
+        "Error occurred while loading content addressed data:",
+        error
+      );
+    }
+  };
+
   const handleSaveTestData = async () => {
     // Clear the user session here
     await dbClient
@@ -190,46 +230,90 @@ export default function Home() {
         <div>
           <h1>Welcome, {(userSession as UserSession).alias}!</h1>
         </div>
-        <div>
-          <button onClick={handleLogout}>Logout</button>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
         </div>
 
-        <div>
-          <button onClick={() => handleSaveUserPub1()}>Save UserPub1</button>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleSaveUserPub1()}
+          >
+            Save UserPub1
+          </button>
         </div>
 
-        <div>
-          <button onClick={() => handleSaveUserPub2()}>Save UserPub2</button>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleSaveUserPub2()}
+          >
+            Save UserPub2
+          </button>
         </div>
 
-        <div>
-          <button onClick={() => handleAddWriteAccess()}>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleAddWriteAccess()}
+          >
             User2 Add Write Access for user1
           </button>
         </div>
 
-        <div>
-          <button onClick={() => handleSaveTestData()}>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleSaveTestData()}
+          >
             User 1 Save test data to User2
           </button>
         </div>
 
-        <div>
-          <button onClick={() => handleSaveTestData2()}>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleSaveTestData2()}
+          >
             User 1 Save test data to another User2 path
           </button>
         </div>
 
-        <div>
-          <button onClick={() => handleLoadData("/nfts_data.json")}>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleLoadData("/nfts_data.json")}
+          >
             Load1
           </button>
         </div>
 
-        <div>
-          <button onClick={() => handleLoadData("/nfts_data2.json")}>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleLoadData("/nfts_data2.json")}
+          >
             Load2
           </button>
+        </div>
+
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleLoadContentAddressed()}
+          >
+            Test content addressed
+          </button>
+          <p className="italic">
+            This will save a message `hello world` to the database and retrieve
+            it using the hash
+          </p>
+          {message}
         </div>
 
         <UserNFTs userPub={(userSession as UserSession).keys.pub} />
