@@ -120,6 +120,19 @@ export default function Home() {
     console.log("handleAddWriteAccess: User2 gave write permission to user1");
   };
 
+  const handleAddWriteAccessAll = async () => {
+    const userPub = user.is.pub;
+
+    await user.addWriteAcess(`users/${userPub}/nfts`, "*");
+    console.log("handleAddWriteAccess: user1:", userPub1);
+    console.log("handleAddWriteAccess: user2:", userPub2);
+    console.log(
+      `handleAddWriteAccess: user ${
+        userPub === userPub1 ? "user1" : "user2"
+      } gave write permission to all users`
+    );
+  };
+
   const handleLoadContentAddressed = async () => {
     const data = { message: "hello world" };
 
@@ -183,8 +196,8 @@ export default function Home() {
   const handleSaveTestData2 = async () => {
     // Clear the user session here
     await dbClient
-      .user(userPub2)
-      .get("hey")
+      .user(userPub1)
+      .get("nfts")
       .put(
         {
           address: "0x53500C03409CfFeC90D44d0FF4eA96DcB7628398",
@@ -198,7 +211,7 @@ export default function Home() {
             console.log("handleSaveTestData: user1:", userPub1);
             console.log("handleSaveTestData: user2:", userPub2);
             console.log(
-              "handleSaveTestData: Saved data for user1 to user2:",
+              "handleSaveTestData: Saved data for user2 to user1:",
               userPub1
             );
           } else {
@@ -269,9 +282,18 @@ export default function Home() {
         <div className="mb-6">
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleAddWriteAccessAll()}
+          >
+            User Adds Write Access for all users
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
             onClick={() => handleSaveTestData()}
           >
-            User 1 Save test data to User2
+            User 1 Save test data to another User2 path
           </button>
         </div>
 
@@ -280,7 +302,7 @@ export default function Home() {
             className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
             onClick={() => handleSaveTestData2()}
           >
-            User 1 Save test data to another User2 path
+            User 2 Save test data to another User1 path
           </button>
         </div>
 
