@@ -4,15 +4,26 @@ import { useNFTs } from "../src/hooks/useNFTs";
 import { useRecoilState } from "recoil";
 
 // Ensure this path is correct
-import { libsodium } from "../src/utils/libsodium";
 import { useQueryClient } from "@tanstack/react-query";
 import UserNFTs from "../src/components/userNFTs";
 import { userpubstate1 } from "../src/atoms/userAtom1";
 import { userpubstate2 } from "../src/atoms/userAtom2";
 import { dbClient, getUser } from "../src/GlobalOrbit";
 
+type UserKeys = {
+  priv: string;
+  pub: string;
+  epriv?: string;
+  epub?: string;
+};
+
+type UserSession = {
+  alias: string;
+  keys: UserKeys;
+};
+
 export default function Home() {
-  const [userSession, setUserSession] = useState(null);
+  const [userSession, setUserSession] = useState<UserSession | null>(null);
   const { createNFT } = useCreateNFT();
   const queryClient = useQueryClient();
   const [userPub1, setUserPub1] = useRecoilState(userpubstate1);
@@ -24,8 +35,8 @@ export default function Home() {
   useEffect(() => {
     // Check if user session exists
     console.log("index.tsx: useEffect: user: ", user);
-    if (user?.recall) {
-      const session = user.recall();
+    if (user?.session) {
+      const session = user.session();
       if (session) {
         setUserSession(session);
       }
@@ -38,21 +49,21 @@ export default function Home() {
     // The ready check is no longer necessary here since libsodium is initialized at the app level
 
     if (!(await user?.exists(alias))) {
-      user.create(alias, password, (error, keys) => {
+      user.create(alias, password, (error: Error, keys: any) => {
         if (error) {
           console.error("User creation failed:", error);
         } else {
           console.log("User created successfully, user keys:", keys);
-          setUserSession(user.recall());
+          setUserSession(user.session());
         }
       });
     } else
-      user.auth(alias, password, (error, keys) => {
+      user.auth(alias, password, (error: Error, keys: any) => {
         if (error) {
           console.error("Login failed:", error);
         } else {
           console.log("Logged in successfully, user keys:", keys);
-          setUserSession(user.recall());
+          setUserSession(user.session());
         }
       });
 
@@ -65,11 +76,11 @@ export default function Home() {
     setUserSession(null);
   };
 
-  const handleLoadData = async (dataPath) => {
+  const handleLoadData = async (dataPath: string) => {
     if (userSession) {
       const response = await fetch(dataPath);
       const { nfts } = await response.json();
-      nfts.forEach(async (nft) => {
+      nfts.forEach(async (nft: any) => {
         createNFT(nft as any);
       });
     }
@@ -113,7 +124,7 @@ export default function Home() {
           name: "hello world",
         },
         undefined,
-        (ack) => {
+        (ack: any) => {
           if (!ack.err) {
             console.log("Put operation successful");
             console.log("handleSaveTestData: user1:", userPub1);
@@ -141,7 +152,7 @@ export default function Home() {
           name: "hello Mars",
         },
         undefined,
-        (ack) => {
+        (ack: any) => {
           if (!ack.err) {
             console.log("Put operation successful");
             console.log("handleSaveTestData: user1:", userPub1);
@@ -177,7 +188,7 @@ export default function Home() {
     return (
       <div>
         <div>
-          <h1>Welcome, {userSession.alias}!</h1>
+          <h1>Welcome, {(userSession as UserSession).alias}!</h1>
         </div>
         <div>
           <button onClick={handleLogout}>Logout</button>
@@ -221,7 +232,7 @@ export default function Home() {
           </button>
         </div>
 
-        <UserNFTs userPub={userSession.keys.pub} />
+        <UserNFTs userPub={(userSession as UserSession).keys.pub} />
       </div>
     );
   }

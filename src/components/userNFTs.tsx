@@ -12,7 +12,7 @@ const UserNFTs = ({ userPub }: { userPub: string }) => {
     <div className="mt-2">
       {userPub &&
         nfts &&
-        nfts.map((nft, index) => (
+        nfts.map((nft: any, index: number) => (
           <div key={index}>
             <h1>{nft.name}</h1>
             <p>{nft.summary}</p>

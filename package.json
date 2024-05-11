@@ -11,7 +11,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.29.2",
     "bcryptjs": "^2.4.3",
-    "fabstirdb-lib": "E:\\\\dev\\\\Fabstir\\\\partners\\\\Sia\\\\fabstirdb-lib\\\\fabstirdb-lib-v1.0.4.tgz",
+    "fabstirdb-lib": "E:\\\\dev\\\\Fabstir\\\\partners\\\\Sia\\\\GitHub\\\\fabstirdb-lib\\\\fabstirdb-lib-v1.0.14.tgz",
     "jsonwebtoken": "^9.0.2",
     "libsodium-wrappers": "^0.7.13",
     "next": "14.2.2",
@@ -22,6 +22,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/libsodium-wrappers": "^0.7.14",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

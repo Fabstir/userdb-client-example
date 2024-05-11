@@ -1,8 +1,8 @@
-import { createDBClient } from "fabstirdb-lib";
+import createDBClient from "fabstirdb-lib";
 /**
  * Instance of the OrbitDB client, created using the backend URL.
  */
-const dbClient = createDBClient(process.env.NEXT_PUBLIC_BACKEND_URL || "");
+const dbClient = createDBClient(process.env.NEXT_PUBLIC_BACKEND_URL || "", "");
 
 const getUser = () => {
   if (!dbClient.user) return null;
