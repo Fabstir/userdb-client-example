@@ -58,10 +58,27 @@ export default function Home() {
     }
   }, []);
 
+  const isUserExists = async (alias: string) => {
+    return new Promise((resolve) => {
+      dbClient.get(`~@${alias}`).once((data: any) => {
+        resolve(data !== undefined);
+      });
+    });
+  };
+
   useEffect(() => {
     console.log("index: user.session() =", user.session());
     console.log("index: user.is =", user.is);
     setUserIs(user.is);
+
+    const checkUserExists = async () => {
+      if (user.is) {
+        const exists = await isUserExists(user.is.alias);
+        console.log("index: isUserExists =", exists);
+      }
+    };
+
+    checkUserExists();
   }, [user, userSession]);
 
   const handleLogin = async (alias: string, password: string) => {
