@@ -42,6 +42,7 @@ export default function Home() {
   const [userPub1, setUserPub1] = useRecoilState(userpubstate1);
   const [userPub2, setUserPub2] = useRecoilState(userpubstate2);
   const [message, setMessage] = useState<string>("");
+  const [userAliases, setUserAliases] = useState({});
 
   const user = getUser();
 
@@ -81,18 +82,15 @@ export default function Home() {
     checkUserExists();
   }, [user, userSession]);
 
-  const handleLogin = async (alias: string, password: string) => {
-    // const alias = "test2";
-    // const password = "mypassword";
-    // The ready check is no longer necessary here since libsodium is initialized at the app level
-
-    if (!(await user?.exists(alias))) {
+  const handleLoginUser = async (alias: string, password: string) => {
+    if (!(await isUserExists(alias))) {
       user.create(alias, password, (error: Error, keys: any) => {
         if (error) {
           console.error("User creation failed:", error);
         } else {
           console.log("User created successfully, user keys:", keys);
           setUserSession(user.session());
+          setUserAliases((prev) => ({ ...prev, [alias]: true }));
         }
       });
     } else
@@ -258,19 +256,21 @@ export default function Home() {
         <div className="mb-6">
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
-            onClick={() => handleLogin("test1", "mypassword1")}
+            onClick={() => handleLoginUser("test1", "mypassword1")}
           >
-            Login
+            {!userAliases["test1"] ? "Create user 1" : "Auth user 1"}
           </button>
         </div>
+
         <div className="mb-6">
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
-            onClick={() => handleLogin("test2", "mypassword2")}
+            onClick={() => handleLoginUser("test2", "mypassword2")}
           >
-            Login 2
+            {!userAliases["test2"] ? "Create user 2" : "Auth user 2"}
           </button>
         </div>
+
         <div>user.is is {userIs ? "true" : "false"}</div>
       </div>
     );
