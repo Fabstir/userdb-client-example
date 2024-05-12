@@ -17,6 +17,11 @@ if (typeof window !== "undefined") {
   SEA = require("gun/sea");
 }
 
+dbClient.on("auth", async (event) => {
+  const user = getUser();
+  console.log("index: auth event emitted, user.is = ", user?.is);
+});
+
 type UserKeys = {
   priv: string;
   pub: string;
@@ -31,6 +36,7 @@ type UserSession = {
 
 export default function Home() {
   const [userSession, setUserSession] = useState<UserSession | null>(null);
+  const [userIs, setUserIs] = useState<boolean>(false);
   const { createNFT } = useCreateNFT();
   const queryClient = useQueryClient();
   const [userPub1, setUserPub1] = useRecoilState(userpubstate1);
@@ -38,9 +44,10 @@ export default function Home() {
   const [message, setMessage] = useState<string>("");
 
   const user = getUser();
-  console.log("index.tsx: user: ", user);
 
   useEffect(() => {
+    console.log("index: user: ", user);
+
     // Check if user session exists
     console.log("index.tsx: useEffect: user: ", user);
     if (user?.session) {
@@ -50,6 +57,12 @@ export default function Home() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    console.log("index: user.session() =", user.session());
+    console.log("index: user.is =", user.is);
+    setUserIs(user.is);
+  }, [user, userSession]);
 
   const handleLogin = async (alias: string, password: string) => {
     // const alias = "test2";
@@ -81,6 +94,7 @@ export default function Home() {
 
   const handleLogout = () => {
     // Clear the user session here
+    user.logout();
     setUserSession(null);
   };
 
@@ -224,25 +238,32 @@ export default function Home() {
   if (!userSession) {
     return (
       <div>
-        <div>
-          <button onClick={() => handleLogin("test1", "mypassword1")}>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleLogin("test1", "mypassword1")}
+          >
             Login
           </button>
         </div>
-        <div>
-          <button onClick={() => handleLogin("test2", "mypassword2")}>
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleLogin("test2", "mypassword2")}
+          >
             Login 2
           </button>
         </div>
-        {/* <button onClick={() => handleDisplayData()}>Display</button> */}
+        <div>user.is is {userIs ? "true" : "false"}</div>
       </div>
     );
   } else {
     return (
       <div>
-        <div>
+        <div className="mb-6">
           <h1>Welcome, {(userSession as UserSession).alias}!</h1>
         </div>
+        <div className="mb-6">user.is is {userIs ? "true" : "false"}</div>
         <div className="mb-6">
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
@@ -342,5 +363,4 @@ export default function Home() {
       </div>
     );
   }
-  // if (isLoading) return <div>Loading...</div>;
 }
