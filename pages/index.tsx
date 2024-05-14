@@ -85,7 +85,7 @@ export default function Home() {
   const handleLoginUser = async (alias: string, password: string) => {
     if (!(await isUserExists(alias))) {
       user.create(alias, password, (error: Error, keys: any) => {
-        if (error) {
+        if (error.err) {
           console.error("User creation failed:", error);
         } else {
           console.log("User created successfully, user keys:", keys);
@@ -93,15 +93,26 @@ export default function Home() {
           setUserAliases((prev) => ({ ...prev, [alias]: true }));
         }
       });
-    } else
-      user.auth(alias, password, (error: Error, keys: any) => {
-        if (error) {
+    } else {
+      dbClient.user().auth(alias, password, async (error: Error, keys: any) => {
+        if (error.err) {
           console.error("Login failed:", error);
         } else {
           console.log("Logged in successfully, user keys:", keys);
-          setUserSession(user.session());
+          const theSession = user.session();
+          setUserSession(theSession);
+
+          const alias2 = await new Promise((resolve) =>
+            user.get("alias").once(resolve)
+          );
+          console.log("alias2", alias2);
+          // userAuthPub string
+          console.log("user._.sea", user._.sea);
+          const pub = user._.sea.pub;
+          console.log("pub", pub);
         }
       });
+    }
 
     // Clear the react-query cache
     queryClient.removeQueries();
@@ -109,7 +120,7 @@ export default function Home() {
 
   const handleLogout = () => {
     // Clear the user session here
-    user.logout();
+    user.leave();
     setUserSession(null);
   };
 
@@ -199,13 +210,13 @@ export default function Home() {
     await dbClient
       .user(userPub2)
       .get("nfts")
+      .get("special_id")
       .put(
         {
           address: "0x43500C0340ACfFeC80D44d0EF4eA96DcB7628398",
           id: "1000",
           name: "hello world",
         },
-        undefined,
         (ack: any) => {
           if (!ack.err) {
             console.log("Put operation successful");
@@ -222,18 +233,39 @@ export default function Home() {
       );
   };
 
+  const handleSaveTestDeleteData = async () => {
+    // Clear the user session here
+    await dbClient
+      .user(userPub2)
+      .get("nfts")
+      .get("special_id")
+      .put(null, (ack: any) => {
+        if (!ack.err) {
+          console.log("Delete operation successful");
+          console.log("handleSaveTestDeleteData: user1:", userPub1);
+          console.log("handleSaveTestDeleteData: user2:", userPub2);
+          console.log(
+            "handleSaveTestDeleteData: Deleted data as user2:",
+            userPub1
+          );
+        } else {
+          console.error("Put operation failed:", ack.err);
+        }
+      });
+  };
+
   const handleSaveTestData2 = async () => {
     // Clear the user session here
     await dbClient
       .user(userPub1)
       .get("nfts")
+      .get("special_id")
       .put(
         {
           address: "0x53500C03409CfFeC90D44d0FF4eA96DcB7628398",
           id: "1001",
           name: "hello Mars",
         },
-        undefined,
         (ack: any) => {
           if (!ack.err) {
             console.log("Put operation successful");
@@ -332,6 +364,15 @@ export default function Home() {
             onClick={() => handleSaveTestData()}
           >
             User 1 Save test data to another User2 path
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-4"
+            onClick={() => handleSaveTestDeleteData()}
+          >
+            Delete data from User2 path
           </button>
         </div>
 

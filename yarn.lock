@@ -1164,9 +1164,9 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-"fabstirdb-lib@file:../GitHub/fabstirdb-lib/fabstirdb-lib-v1.0.31.tgz":
-  version "1.0.31"
-  resolved "file:../GitHub/fabstirdb-lib/fabstirdb-lib-v1.0.31.tgz#cb74b5477160442ce069c9ebab8cb9089f0c4f64"
+"fabstirdb-lib@file:../GitHub/fabstirdb-lib/fabstirdb-lib-v1.0.56.tgz":
+  version "1.0.56"
+  resolved "file:../GitHub/fabstirdb-lib/fabstirdb-lib-v1.0.56.tgz#b14615f37aec1c81cc1a495b1992043d76f73120"
   dependencies:
     bcryptjs "^2.4.3"
     crypto "^1.0.1"
